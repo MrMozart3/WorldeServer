@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>WebSocket Test</title>
+</head>
+<body>
+<h1>WebSocket Test</h1>
+<button onclick="connect()">Connect</button>
+<button onclick="sendMessage()">Send Message</button>
+<script>
+    var socket;
+
+    function connect() {
+        socket = new WebSocket("ws://localhost:8080/wordle");
+
+        socket.onopen = function(event) {
+            console.log("Connection opened");
+        };
+
+        socket.onmessage = function(event) {
+            console.log("Message received: " + event.data);
+        };
+
+        socket.onclose = function(event) {
+            console.log("Connection closed");
+        };
+    }
+
+    function sendMessage() {
+        if (socket && socket.readyState === WebSocket.OPEN) {
+            socket.send("Hello, Server!");
+        }
+    }
+</script>
+</body>
+</html>
