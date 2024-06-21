@@ -4,6 +4,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import lombok.Data;
+import org.springframework.web.socket.WebSocketSession;
 import pl.ekoreo.worldeserver.components.GameCleaner;
 import pl.ekoreo.worldeserver.enums.GameTypes;
 import pl.ekoreo.worldeserver.exceptions.gameManager.ToManyRunningGamesException;
@@ -44,6 +45,20 @@ public class GameManager {
     }
     public Game<?> getGame(String gameId){
         return games.get(gameId);
+    }
+
+    /**
+     * Get game by session
+     * @param session WebSocketSession
+     * @return Game Object or null if game not found
+     */
+    public Game<?> getGameBySession(WebSocketSession session){
+        for(Game<?> game : games.values()){
+            if(game.FindPlayerBySession(session) != null){
+                return game;
+            }
+        }
+        return null;
     }
     /*
     public Game findPlayerGame(String sessionId){

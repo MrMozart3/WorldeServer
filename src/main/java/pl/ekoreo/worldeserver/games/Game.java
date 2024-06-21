@@ -1,19 +1,22 @@
 package pl.ekoreo.worldeserver.games;
 
 import lombok.Data;
+import org.json.JSONObject;
 import org.springframework.web.socket.WebSocketSession;
+import pl.ekoreo.worldeserver.exceptions.handleInput.HandleInputException;
 import pl.ekoreo.worldeserver.exceptions.join.JoinGameException;
+import pl.ekoreo.worldeserver.games.wordle.WordlePlayer;
 
 import java.util.Vector;
 
 @Data
-public abstract class Game<PlayerType>{
+public abstract class Game<T extends Player>{
     //data about game
     String gameId;
     int gameType;
     //data about players
     int maxPlayers;
-    Vector<PlayerType> players = new Vector<>();
+    Vector<T> players = new Vector<>();
     String hostId;
     //data about game state
     boolean gameStarted;
@@ -47,5 +50,17 @@ public abstract class Game<PlayerType>{
      * @param player Player Object
      * @param message message to send
      */
-    public abstract void SendToOne(PlayerType player, String message);
+    public abstract void SendToOne(T player, String message);
+    /**
+     * Find player by session
+     * @param session WebSocketSession
+     * @return Player Object or null if player not found
+     */
+    public abstract T FindPlayerBySession(WebSocketSession session);
+    /**
+     * Handle message from player
+     * @param session WebSocketSession
+     * @param message message from player
+     */
+    public abstract void HandleMessage(WebSocketSession session, JSONObject message) throws HandleInputException;
 }

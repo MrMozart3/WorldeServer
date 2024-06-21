@@ -11,6 +11,9 @@ public class Player {
     private WebSocketSession session;
     private String nickname;
     public boolean sendText(String text){
+        if(!session.isOpen()){
+            return false;
+        }
         try {
             session.sendMessage(new TextMessage(text));
             return true;

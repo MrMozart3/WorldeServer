@@ -1,40 +1,138 @@
 <!DOCTYPE html>
-<html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>WebSocket Test</title>
 </head>
-<body>
 <h1>WebSocket Test</h1>
+<button onclick="createGame()">Create Game</button><br><br>
+
 <button onclick="connect()">Connect</button>
 
-<input type="text" id="connect_id" value="" style="width: 300px;" placeholder="gameId">
-<input type="text" id="connect_nickname" value="" style="width: 100px;" placeholder="nickname"><br><br>
+<input type="text" id="connect_id" value="" style="width: 300px;" placeholder="gameId"> nickname </input>
+<input type="text" id="connect_nickname" value="MrMozart" style="width: 100px;" placeholder="nickname"></input><br><br>
 
-<button onclick="sendMessage()">Send Message</button>
+<button onclick="sendCustomMessage()">Custom Message</button>
 
-<input type="text" id="message" value="" style="width: 300px;" placeholder="message"><br><br>
+<input type="text" id="customMessage" value="" style="width: 300px;" placeholder="message"><br><br>
 
-<button onclick="createGame()">Create Game</button>
+
+
+<button onclick="startGame()">Start Game </button>
+<input type="number" id="start_game_rounds" value="3" style="width: 30px;" placeholder="rounds"> rounds </input>
+<input type="number" id="start_game_timePerRound" value="10" style="width: 30px;" placeholder="rounds"> timePerRound </input>
 <br><br>
 
+<button onclick="guessWord()">Word </button>
+
+<input type="text" id="guess_word" value="" style="width: 70px;" placeholder="word" maxlength="5">
+<br><br>
+<style>
+    table{
+        border-collapse: collapse;margin: 20px;
+    }
+    td {
+        width: 50px;
+        height: 50px;
+        text-align: center;
+        vertical-align: middle;
+        font-size: 24px;
+        border: 1px solid #000;
+        cursor: pointer;
+    }
+</style>
+<table id="grid">
+    <tr>
+        <td contenteditable="true">A</td>
+        <td contenteditable="true">B</td>
+        <td contenteditable="true">C</td>
+        <td contenteditable="true">D</td>
+        <td contenteditable="true">E</td>
+    </tr>
+    <tr>
+        <td contenteditable="true">F</td>
+        <td contenteditable="true">G</td>
+        <td contenteditable="true">H</td>
+        <td contenteditable="true">I</td>
+        <td contenteditable="true">J</td>
+    </tr>
+    <tr>
+        <td contenteditable="true">K</td>
+        <td contenteditable="true">L</td>
+        <td contenteditable="true">M</td>
+        <td contenteditable="true">N</td>
+        <td contenteditable="true">O</td>
+    </tr>
+    <tr>
+        <td contenteditable="true">P</td>
+        <td contenteditable="true">Q</td>
+        <td contenteditable="true">R</td>
+        <td contenteditable="true">S</td>
+        <td contenteditable="true">T</td>
+    </tr>
+    <tr>
+        <td contenteditable="true">U</td>
+        <td contenteditable="true">V</td>
+        <td contenteditable="true">W</td>
+        <td contenteditable="true">X</td>
+        <td contenteditable="true">Y</td>
+    </tr>
+    <tr>
+        <td contenteditable="true">U</td>
+        <td contenteditable="true">V</td>
+        <td contenteditable="true">W</td>
+        <td contenteditable="true">X</td>
+        <td contenteditable="true">Y</td>
+    </tr>
+</table>
+
 <textarea id="console" disabled style="width: 300px; height: 500px;"></textarea>
-<textarea id="game_console" disabled style="width: 300px; height: 500px;"></textarea>
+<textarea id="game_console" disabled style="width: 1000px; height: 500px;"></textarea>
+
+
 
 <script>
     var consoleTextarea = document.getElementById("console");
     var gameConsoleTextarea = document.getElementById("game_console");
     var connectIdInput = document.getElementById("connect_id");
     var connectNicknameInput = document.getElementById("connect_nickname");
+    var startGameRoundsInput = document.getElementById("start_game_rounds");
+    var startGameTimePerRoundInput = document.getElementById("start_game_timePerRound");
+    var guessWordInput = document.getElementById("guess_word");
     var socket;
 
+    for(let i =0; i < 6; i++) for(let j = 0; j < 5; j++) {
+        changeLetter(i, j, "-");
+        changeBackground(i, j, "#A9A9A9")
+    }
+
+    function guessWord(){
+        let json = {
+            type:"WORD",
+            data:{
+                word:guessWordInput.value
+            }
+        }
+        sendMessage(JSON.stringify(json));
+    }
     function appendConsole(message) {
         consoleTextarea.value += message + "\n";
     }
     function appendGameConsole(message) {
         gameConsoleTextarea.value += message + "\n";
     }
-
+    function startGame(){
+        let json = {
+            type:"START_GAME",
+            data:{
+                rounds:startGameRoundsInput.value,
+                timePerRound:startGameTimePerRoundInput.value
+            }
+        }
+        sendMessage(JSON.stringify(json));
+    }
+    function sendCustomMessage(){
+        sendMessage(JSON.stringify(document.getElementById("customMessage").value));
+    }
     function createGame() {
         var xhr = new XMLHttpRequest();
         xhr.open("GET", "http://localhost:8080/api/createGame", true); // Ensure to include http:// or https://
@@ -61,7 +159,22 @@
         };
 
         socket.onmessage = function(event) {
+            let json = JSON.parse(event.data);
             appendGameConsole("Message received: " + event.data);
+            if(json.type === "NEW_BOARD"){
+                for(let i = 0; i < 6; i++){
+                    for (let j = 0; j < 5; j++) {
+                        changeLetter(i, j, json.data.board[i][j].letter);
+                        if (json.data.board[i][j].color == "W") {
+                            changeBackground(i, j, "#A9A9A9");  // Changed to a valid CSS color string
+                        } else if (json.data.board[i][j].color == "O") {
+                            changeBackground(i, j, "#FF8C00");  // Changed to a valid CSS color string
+                        } else if (json.data.board[i][j].color == "G") {
+                            changeBackground(i, j, "#006400");  // Changed to a valid CSS color string
+                        }
+                    }
+                }
+            }
         };
 
         socket.onclose = function(event) {
@@ -69,12 +182,21 @@
         };
     }
 
-    function sendMessage() {
+    function sendMessage(message) {
         if (socket && socket.readyState === WebSocket.OPEN) {
-            socket.send(document.getElementById("message").value);
+            console.log(message);
+            socket.send(message);
         } else {
             appendConsole("WebSocket connection not open.");
         }
+    }
+    function changeLetter(line, x, letter){
+        let grid = document.getElementById("grid");
+        grid.rows[line].cells[x].innerText = letter;
+    }
+    function changeBackground(line, x, color){
+        let grid = document.getElementById("grid");
+        grid.rows[line].cells[x].style.backgroundColor = color;
     }
 </script>
 </body>
