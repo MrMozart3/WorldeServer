@@ -7,29 +7,71 @@
 <body>
 <h1>WebSocket Test</h1>
 <button onclick="connect()">Connect</button>
+
+<input type="text" id="connect_id" value="" style="width: 300px;"><br><br>
+
 <button onclick="sendMessage()">Send Message</button>
+
+<input type="text" id="message" value="" style="width: 300px;"><br><br>
+
+<button onclick="createGame()">Create Game</button>
+<br><br>
+
+<textarea id="console" disabled style="width: 300px; height: 500px;"></textarea>
+<textarea id="game_console" disabled style="width: 300px; height: 500px;"></textarea>
+
 <script>
+    var consoleTextarea = document.getElementById("console");
+    var gameConsoleTextarea = document.getElementById("game_console");
+    var connectIdInput = document.getElementById("connect_id");
     var socket;
 
+    function appendConsole(message) {
+        consoleTextarea.value += message + "\n";
+    }
+    function appendGameConsole(message) {
+        gameConsoleTextarea.value += message + "\n";
+    }
+
+    function createGame() {
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", "http://localhost:8080/api/createGame", true); // Ensure to include http:// or https://
+
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4) {
+                if (xhr.status === 200) {
+                    appendConsole("Game created: " + xhr.responseText);
+                    connectIdInput.value = xhr.responseText;
+                } else {
+                    appendConsole("Failed to create game. Status: " + xhr.status);
+                }
+            }
+        };
+
+        xhr.send();
+    }
+
     function connect() {
-        socket = new WebSocket("ws://localhost:8080/wordle");
+        socket = new WebSocket("ws://localhost:8080/game?game_id=" + connectIdInput.value + "&nickname=player1");
 
         socket.onopen = function(event) {
-            console.log("Connection opened");
+            appendConsole("Connection opened");
         };
 
         socket.onmessage = function(event) {
-            console.log("Message received: " + event.data);
+            appendGameConsole("Message received: " + event.data);
         };
 
         socket.onclose = function(event) {
-            console.log("Connection closed");
+            appendConsole("Connection closed");
         };
     }
 
     function sendMessage() {
         if (socket && socket.readyState === WebSocket.OPEN) {
-            socket.send("Hello, Server!");
+            socket.send(document.getElementById("message").value);
+        } else {
+            appendConsole("WebSocket connection not open.");
         }
     }
 </script>
