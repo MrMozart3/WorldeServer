@@ -3,8 +3,6 @@ package pl.ekoreo.worldeserver.games.wordle;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.HashMap;
-import java.util.Map;
 
 @Getter
 @Setter
@@ -36,13 +34,6 @@ public class WordleBoard {
      * @return returns false if word is incorrect, true if word is correct
      */
     public boolean AddAnswer(int row, char[] word, char[] answer){
-        /*if(word == null || answer == null){
-            return -1;
-        }
-        if(word.length != 5 || answer.length != 5){
-            return -1;
-        }*/
-        //TODO check word and answer in alphabet
         //TODO check if word is in dictionary, if isn't return -1
         for(int i = 0; i < 5; i++){
             board[row][i] = word[i];

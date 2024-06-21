@@ -5,7 +5,8 @@ import pl.ekoreo.worldeserver.enums.OutputTypes;
 public enum OutputTypesWordle{
     LOBBY("LOBBY"),
     WAITING_FOR_INPUT("WAITING_FOR_INPUT"),
-    NEW_BOARD("NEW_BOARD"),
+    WAITING_FOR_OTHERS("WAITING_FOR_OTHERS"),
+    PLAYER_DATA("PLAYER_DATA"),
     END("END");
 
 

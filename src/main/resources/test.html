@@ -40,7 +40,54 @@
         cursor: pointer;
     }
 </style>
-<table id="grid">
+
+
+<div style="display: flex;flex-flow: row">
+    <table id="grid0">
+        <tr>
+            <td contenteditable="true">A</td>
+            <td contenteditable="true">B</td>
+            <td contenteditable="true">C</td>
+            <td contenteditable="true">D</td>
+            <td contenteditable="true">E</td>
+        </tr>
+        <tr>
+            <td contenteditable="true">F</td>
+            <td contenteditable="true">G</td>
+            <td contenteditable="true">H</td>
+            <td contenteditable="true">I</td>
+            <td contenteditable="true">J</td>
+        </tr>
+        <tr>
+            <td contenteditable="true">K</td>
+            <td contenteditable="true">L</td>
+            <td contenteditable="true">M</td>
+            <td contenteditable="true">N</td>
+            <td contenteditable="true">O</td>
+        </tr>
+        <tr>
+            <td contenteditable="true">P</td>
+            <td contenteditable="true">Q</td>
+            <td contenteditable="true">R</td>
+            <td contenteditable="true">S</td>
+            <td contenteditable="true">T</td>
+        </tr>
+        <tr>
+            <td contenteditable="true">U</td>
+            <td contenteditable="true">V</td>
+            <td contenteditable="true">W</td>
+            <td contenteditable="true">X</td>
+            <td contenteditable="true">Y</td>
+        </tr>
+        <tr>
+            <td contenteditable="true">U</td>
+            <td contenteditable="true">V</td>
+            <td contenteditable="true">W</td>
+            <td contenteditable="true">X</td>
+            <td contenteditable="true">Y</td>
+        </tr>
+    </table>
+    <table id="grid1">
     <tr>
         <td contenteditable="true">A</td>
         <td contenteditable="true">B</td>
@@ -84,6 +131,97 @@
         <td contenteditable="true">Y</td>
     </tr>
 </table>
+    <table id="grid2">
+        <tr>
+            <td contenteditable="true">A</td>
+            <td contenteditable="true">B</td>
+            <td contenteditable="true">C</td>
+            <td contenteditable="true">D</td>
+            <td contenteditable="true">E</td>
+        </tr>
+        <tr>
+            <td contenteditable="true">F</td>
+            <td contenteditable="true">G</td>
+            <td contenteditable="true">H</td>
+            <td contenteditable="true">I</td>
+            <td contenteditable="true">J</td>
+        </tr>
+        <tr>
+            <td contenteditable="true">K</td>
+            <td contenteditable="true">L</td>
+            <td contenteditable="true">M</td>
+            <td contenteditable="true">N</td>
+            <td contenteditable="true">O</td>
+        </tr>
+        <tr>
+            <td contenteditable="true">P</td>
+            <td contenteditable="true">Q</td>
+            <td contenteditable="true">R</td>
+            <td contenteditable="true">S</td>
+            <td contenteditable="true">T</td>
+        </tr>
+        <tr>
+            <td contenteditable="true">U</td>
+            <td contenteditable="true">V</td>
+            <td contenteditable="true">W</td>
+            <td contenteditable="true">X</td>
+            <td contenteditable="true">Y</td>
+        </tr>
+        <tr>
+            <td contenteditable="true">U</td>
+            <td contenteditable="true">V</td>
+            <td contenteditable="true">W</td>
+            <td contenteditable="true">X</td>
+            <td contenteditable="true">Y</td>
+        </tr>
+    </table>
+
+
+<table id="grid3">
+    <tr>
+        <td contenteditable="true">A</td>
+        <td contenteditable="true">B</td>
+        <td contenteditable="true">C</td>
+        <td contenteditable="true">D</td>
+        <td contenteditable="true">E</td>
+    </tr>
+    <tr>
+        <td contenteditable="true">F</td>
+        <td contenteditable="true">G</td>
+        <td contenteditable="true">H</td>
+        <td contenteditable="true">I</td>
+        <td contenteditable="true">J</td>
+    </tr>
+    <tr>
+        <td contenteditable="true">K</td>
+        <td contenteditable="true">L</td>
+        <td contenteditable="true">M</td>
+        <td contenteditable="true">N</td>
+        <td contenteditable="true">O</td>
+    </tr>
+    <tr>
+        <td contenteditable="true">P</td>
+        <td contenteditable="true">Q</td>
+        <td contenteditable="true">R</td>
+        <td contenteditable="true">S</td>
+        <td contenteditable="true">T</td>
+    </tr>
+    <tr>
+        <td contenteditable="true">U</td>
+        <td contenteditable="true">V</td>
+        <td contenteditable="true">W</td>
+        <td contenteditable="true">X</td>
+        <td contenteditable="true">Y</td>
+    </tr>
+    <tr>
+        <td contenteditable="true">U</td>
+        <td contenteditable="true">V</td>
+        <td contenteditable="true">W</td>
+        <td contenteditable="true">X</td>
+        <td contenteditable="true">Y</td>
+    </tr>
+</table>
+</div>
 
 <textarea id="console" disabled style="width: 300px; height: 500px;"></textarea>
 <textarea id="game_console" disabled style="width: 1000px; height: 500px;"></textarea>
@@ -100,11 +238,12 @@
     var guessWordInput = document.getElementById("guess_word");
     var socket;
 
-    for(let i =0; i < 6; i++) for(let j = 0; j < 5; j++) {
-        changeLetter(i, j, "-");
-        changeBackground(i, j, "#A9A9A9")
+    for(let x = 0; x < 4; x++){
+        for(let i =0; i < 6; i++) for(let j = 0; j < 5; j++) {
+            changeLetter(i, j, "-", x);
+            changeBackground(i, j, 'W', x)
+        }
     }
-
     function guessWord(){
         let json = {
             type:"WORD",
@@ -161,17 +300,19 @@
         socket.onmessage = function(event) {
             let json = JSON.parse(event.data);
             appendGameConsole("Message received: " + event.data);
-            if(json.type === "NEW_BOARD"){
-                for(let i = 0; i < 6; i++){
-                    for (let j = 0; j < 5; j++) {
-                        changeLetter(i, j, json.data.board[i][j].letter);
-                        if (json.data.board[i][j].color == "W") {
-                            changeBackground(i, j, "#A9A9A9");  // Changed to a valid CSS color string
-                        } else if (json.data.board[i][j].color == "O") {
-                            changeBackground(i, j, "#FF8C00");  // Changed to a valid CSS color string
-                        } else if (json.data.board[i][j].color == "G") {
-                            changeBackground(i, j, "#006400");  // Changed to a valid CSS color string
-                        }
+            if(json.type === "PLAYER_DATA"){
+                let data = json.data;
+                //me
+                for(let i = 0; i < data.length; i++){
+                    if(data[i].me === true){
+                        UpdateBoard(data[i], 0);
+                    }
+                }
+                //others
+                let cur = 1;
+                for(let i = 0; i < data.length; i++){
+                    if(data[i].me === false){
+                        UpdateBoard(data[i], cur++);
                     }
                 }
             }
@@ -181,7 +322,13 @@
             appendConsole("Connection closed");
         };
     }
-
+    function UpdateBoard(userData, board_id){
+        let board = userData.board;
+        for(let i = 0; i < 6; i++) for(let j = 0; j < 5; j++) {
+            changeLetter(i, j, board[i][j].letter, board_id);
+            changeBackground(i, j, board[i][j].color, board_id);
+        }
+    }
     function sendMessage(message) {
         if (socket && socket.readyState === WebSocket.OPEN) {
             console.log(message);
@@ -190,13 +337,16 @@
             appendConsole("WebSocket connection not open.");
         }
     }
-    function changeLetter(line, x, letter){
-        let grid = document.getElementById("grid");
+    function changeLetter(line, x, letter, gridID){
+        let grid = document.getElementById("grid" + gridID);
         grid.rows[line].cells[x].innerText = letter;
     }
-    function changeBackground(line, x, color){
-        let grid = document.getElementById("grid");
-        grid.rows[line].cells[x].style.backgroundColor = color;
+    function changeBackground(line, x, color, gridID){
+        let grid = document.getElementById("grid" + gridID);
+        if(color === 'W') grid.rows[line].cells[x].style.backgroundColor = "#A9A9A9";
+        else if(color === 'O') grid.rows[line].cells[x].style.backgroundColor = "#FFA500";
+        else if(color === 'G') grid.rows[line].cells[x].style.backgroundColor = "#008000";
+
     }
 </script>
 </body>

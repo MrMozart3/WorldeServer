@@ -3,6 +3,7 @@ package pl.ekoreo.worldeserver;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import pl.ekoreo.worldeserver.games.wordle.WordleBoard;
+import pl.ekoreo.worldeserver.games.wordle.WordleUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,28 +24,6 @@ public class WorldeServerApplication {
     public static final String ANSI_WHITE = "\u001B[37m";
     public static void main(String[] args) {
         System.out.println(countLines(new File("C:\\Users\\MrMozartOfficial\\IdeaProjects\\WorldeServer\\src\\main\\java\\pl\\ekoreo\\worldeserver"))  + " Lines Currently");
-        /*WordleBoard board = new WordleBoard();
-        String ans = "kutas";
-        board.AddAnswer(0, "kuata".toCharArray(), ans.toCharArray());
-        for(int i = 0; i < 5; i++){
-            System.out.print(ans.charAt(i) + " ");
-        }
-        System.out.println();
-        for(int i = 0; i < 5; i++){
-            switch(board.colors[0][i]){
-                case WordleBoard.COLOR_WHITE:
-                    System.out.print(ANSI_WHITE + board.board[0][i] + " ");
-                    break;
-                case WordleBoard.COLOR_ORANGE:
-                    System.out.print(ANSI_YELLOW + board.board[0][i] + " ");
-                    break;
-                case WordleBoard.COLOR_GREEN:
-                    System.out.print(ANSI_GREEN + board.board[0][i] + " ");
-                    break;
-            }
-        }
-        System.out.println(ANSI_RESET);*/
-
         SpringApplication.run(WorldeServerApplication.class, args);
     }
     public static int countLines(File file) {

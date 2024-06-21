@@ -16,6 +16,7 @@ import pl.ekoreo.worldeserver.exceptions.join.impl.GameStartedException;
 import pl.ekoreo.worldeserver.exceptions.join.impl.NicknameTakenException;
 import pl.ekoreo.worldeserver.games.Game;
 import pl.ekoreo.worldeserver.games.Player;
+import pl.ekoreo.worldeserver.games.wordle.WordleUtils;
 import pl.ekoreo.worldeserver.utils.JsonUtils;
 
 import java.util.Iterator;
@@ -53,7 +54,12 @@ public class WordleGame extends Game<WordlePlayer> implements Runnable{
             Player player = iterator.next();
             if(player.getSession().getId().equals(sessionId)){
                 //TODO check if player is host(add later)
-                iterator.remove();
+                try {
+                    iterator.remove();
+                } catch (Exception e) {
+                    System.out.println("COULD NOT REMOVE PLAYER");
+                }
+
 
                 System.out.println("Player " + sessionId + " has left the game " + getGameId());
             }
@@ -88,11 +94,11 @@ public class WordleGame extends Game<WordlePlayer> implements Runnable{
         }
 
         InputTypesWordle type;
-        JSONObject data;
+        JSONObject inputData;
 
         try{
             type = InputTypesWordle.valueOf(message.getString("type"));
-            data = message.getJSONObject("data");
+            inputData = message.getJSONObject("data");
         } catch (JSONException e){
             throw new BadRequestException();
         } catch (IllegalArgumentException e){
@@ -106,8 +112,8 @@ public class WordleGame extends Game<WordlePlayer> implements Runnable{
                 }
 
                 try{
-                    rounds = data.getInt("rounds");
-                    timePerRound = data.getInt("timePerRound");
+                    rounds = inputData.getInt("rounds");
+                    timePerRound = inputData.getInt("timePerRound");
                     if(rounds <= 0 || rounds >= 30){
                         throw new BadRequestException();
                     }
@@ -130,12 +136,12 @@ public class WordleGame extends Game<WordlePlayer> implements Runnable{
                     throw new HandleInputException("You have already guessed the word");
                 }
                 try{
-                    player.AddAnswer(player.getCurrentRow(), data.getString("word").toCharArray());
+                    player.AddAnswer(player.getCurrentRow(), inputData.getString("word").toUpperCase().toCharArray());
                 } catch (JSONException e){
                     throw new BadRequestException();
                 }
-                player.sendText(WordleUtils.GenerateWordleBoardJson(player.getBoard()).toString());
-                //TODO send to all players
+
+                SendPlayersData();
 
                 break;
             default:
@@ -156,32 +162,32 @@ public class WordleGame extends Game<WordlePlayer> implements Runnable{
     @Override
     public void run() {
         setGameStarted(true);
-        for(int round = 0; round < rounds; round++){
-            //TODO randomly select word
-            String answer = "KUTAS";
-            for(WordlePlayer p : getPlayers()){
+        for (int round = 0; round < rounds; round++) {
+            String answer = WordleUtils.getRandomWord();
+            for (WordlePlayer p : getPlayers()) {
                 p.ResetBoard();
                 p.setAnswer(answer.toCharArray());
-
             }
 
-            for(int line = 0; line < 6; line++) {
-                for(WordlePlayer p : getPlayers()){
+            for (int line = 0; line < 6; line++) {
+                for (WordlePlayer p : getPlayers()) {
                     p.setSentWord(false);
                     p.setCurrentRow(line);
-                    p.sendText(WordleUtils.GenerateWordleBoardJson(p.getBoard()).toString());
                 }
+                SendPlayersData();
                 for (int time = timePerRound; time >= 0; time--) {
                     try {
                         boolean skip = true;
                         for (WordlePlayer p : getPlayers()) {
-                            if(!p.isSentWord() && !p.isGuessedWord()){
+                            if (!p.isSentWord() && !p.isGuessedWord()) {
                                 p.sendText(WordleUtils.GenerateWaitingForInputJson(round, line, time).toString());
                                 skip = false;
+                            } else {
+                                p.sendText(WordleUtils.GenerateWaitingForOthersJson(round, line).toString());
                             }
-                            //TODO send all other players wordles
+                            //TODO send all other players wordle's
                         }
-                        if(skip) {
+                        if (skip) {
                             break;
                         }
                         Thread.sleep(1000);
@@ -196,4 +202,30 @@ public class WordleGame extends Game<WordlePlayer> implements Runnable{
         SendToAll(JsonUtils.createJsonSingleMessage(OutputTypesWordle.END.value, "Game has ended(TEMPORARY MESSAGE)").toString());
     }
 
+    public void SendPlayersData(){
+        for(int i = 0; i < getPlayers().size(); i++){
+            JSONObject json = new JSONObject();
+
+            json.put("type", OutputTypesWordle.PLAYER_DATA.value);
+            JSONArray data = new JSONArray();
+            for(int j = 0; j < getPlayers().size(); j++){
+                WordlePlayer p = getPlayers().get(j);
+
+                JSONObject playerData = new JSONObject();
+                playerData.put("player_id", j);
+                playerData.put("nickname", p.getNickname());
+                playerData.put("is_host", p.getSession().getId().equals(getHostId()));
+                if(i == j){
+                    playerData.put("me", true);
+                    playerData.put("board", WordleUtils.GenerateWordleBoardJson(p.getBoard(), true));
+                } else {
+                    playerData.put("me", false);
+                    playerData.put("board", WordleUtils.GenerateWordleBoardJson(p.getBoard(), getPlayers().get(i).isGuessedWord()));
+                }
+                data.put(playerData);
+            }
+            json.put("data", data);
+            getPlayers().get(i).sendText(json.toString());
+        }
+    }
 }

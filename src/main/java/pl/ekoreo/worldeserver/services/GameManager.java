@@ -11,6 +11,7 @@ import pl.ekoreo.worldeserver.exceptions.gameManager.ToManyRunningGamesException
 import pl.ekoreo.worldeserver.games.Game;
 import pl.ekoreo.worldeserver.games.Player;
 import pl.ekoreo.worldeserver.games.wordle.WordleGame;
+import pl.ekoreo.worldeserver.games.wordle.WordleUtils;
 
 @Data
 public class GameManager {
@@ -24,6 +25,9 @@ public class GameManager {
             gameCleaner = new GameCleaner(this);
             gameCleaner.start();
         } else gameCleaner = null;
+
+        //config
+        WordleUtils.ReadWords("words.txt");
     }
 
     public String CreateGame(GameTypes gameType) throws ToManyRunningGamesException {
