@@ -3,6 +3,10 @@ package pl.ekoreo.worldeserver.games.wordle;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.web.socket.WebSocketSession;
+import pl.ekoreo.worldeserver.exceptions.join.JoinGameException;
+import pl.ekoreo.worldeserver.exceptions.join.impl.GameFullException;
+import pl.ekoreo.worldeserver.exceptions.join.impl.GameStartedException;
+import pl.ekoreo.worldeserver.exceptions.join.impl.NicknameTakenException;
 import pl.ekoreo.worldeserver.games.Game;
 import java.util.Vector;
 
@@ -11,37 +15,36 @@ public class WordleGame extends Game<WordlePlayer> implements Runnable{
         super(gameId, maxPlayers);
     }
     @Override
-    public synchronized boolean AddPlayer(WebSocketSession session, String nickname) {
-        if(getPlayers().size() < getMaxPlayers() && !isGameStarted()){
-            getPlayers().add(new WordlePlayer(session, nickname));
-            if(getPlayers().size() == 1){
-                setHostId(session.getId());
-            }
-
-            //test message to all
-            SendToAll(getCurrentLobbyJSON().toString());
-
-            System.out.println("Player " + nickname + " has joined the game" + getGameId());
-            return true;
+    public synchronized void AddPlayer(WebSocketSession session, String nickname) throws JoinGameException {
+        if(isGameStarted()){
+            throw new GameStartedException(getGameId());
         }
-        return false;
+        if(getPlayers().size() >= getMaxPlayers()){
+            throw new GameFullException(getGameId());
+        }
+        if(getPlayers().stream().map(WordlePlayer::getNickname).toList().contains(nickname)){
+            throw new NicknameTakenException(nickname);
+        }
+
+
+        getPlayers().add(new WordlePlayer(session, nickname));
+        if(getPlayers().size() == 1){
+            setHostId(session.getId());
+        }
+
+        SendToAll(WordleUtils.GenerateLobbyJson(OutputTypesWordle.LOBBY.value, getPlayers(), getHostId()).toString());
     }
     @Override
-    public synchronized boolean RemovePlayer(String sessionId) {
+    public synchronized void RemovePlayer(String sessionId) {
         for(WordlePlayer player : getPlayers()){
             if(player.getSession().getId().equals(sessionId)){
-                /*check if player is host(add later)*/
-
+                //TODO check if player is host(add later)
                 getPlayers().remove(player);
 
-                //test message to all
-                SendToAll(getCurrentLobbyJSON().toString());
-
                 System.out.println("Player " + sessionId + " has left the game " + getGameId());
-                return true;
             }
         }
-        return false;
+        SendToAll(WordleUtils.GenerateLobbyJson(OutputTypesWordle.LOBBY.value, getPlayers(), getHostId()).toString());
     }
 
     @Override
@@ -64,13 +67,14 @@ public class WordleGame extends Game<WordlePlayer> implements Runnable{
 
     @Override
     public void run() {
-
-    }
-
-    public JSONObject getCurrentLobbyJSON(){
-        JSONObject json = new JSONObject();
-        json.put("type", OutputTypesWordle.LOBBY.value);
-        json.put("data", WordleUtils.sendLobbyJsonObject(getPlayers(), getHostId()));
-        return json;
+        //TODO game logic
+        while(true){
+            try {
+                Thread.sleep(1000);
+                SendToAll("Game is running");
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

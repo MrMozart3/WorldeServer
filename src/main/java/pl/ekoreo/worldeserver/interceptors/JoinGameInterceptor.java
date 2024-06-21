@@ -16,6 +16,9 @@ public class JoinGameInterceptor implements HandshakeInterceptor {
                 String[] queryParams = query.split("&");
                 for (String param : queryParams) {
                     String[] keyValue = param.split("=");
+                    if(keyValue.length != 2){
+                        return false;
+                    }
                     attributes.put(keyValue[0], keyValue[1]);
                 }
                 return true;

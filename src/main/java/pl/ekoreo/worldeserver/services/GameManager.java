@@ -6,7 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import lombok.Data;
 import pl.ekoreo.worldeserver.components.GameCleaner;
 import pl.ekoreo.worldeserver.enums.GameTypes;
-import pl.ekoreo.worldeserver.exceptions.ToManyRunningGamesException;
+import pl.ekoreo.worldeserver.exceptions.gameManager.ToManyRunningGamesException;
 import pl.ekoreo.worldeserver.games.Game;
 import pl.ekoreo.worldeserver.games.Player;
 import pl.ekoreo.worldeserver.games.wordle.WordleGame;

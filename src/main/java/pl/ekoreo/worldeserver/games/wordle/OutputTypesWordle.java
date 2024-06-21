@@ -1,9 +1,9 @@
 package pl.ekoreo.worldeserver.games.wordle;
 
-public enum OutputTypesWordle {
-    LOBBY("LOBBY"),
-    GAME("GAME"),
-    END("END");
+import pl.ekoreo.worldeserver.enums.OutputTypes;
+
+public enum OutputTypesWordle{
+    LOBBY("LOBBY");
 
     public final String value;
     OutputTypesWordle(String value){

@@ -6,9 +6,12 @@ import org.json.JSONObject;
 import java.util.Vector;
 
 public class WordleUtils {
-    public static JSONObject sendLobbyJsonObject(Vector<WordlePlayer> players, String hostId){
+    public static JSONObject GenerateLobbyJson(String typeValue, Vector<WordlePlayer> players, String hostId){
         JSONObject json = new JSONObject();
-        json.put("playerCount", players.size());
+        json.put("type", typeValue);
+
+        JSONObject data = new JSONObject();
+        data.put("playerCount", players.size());
         JSONArray playersJSON = new JSONArray();
         for(WordlePlayer player : players){
             JSONObject playerJson = new JSONObject();
@@ -16,7 +19,9 @@ public class WordleUtils {
             playerJson.put("host", player.getSession().getId().equals(hostId));
             playersJSON.put(playerJson);
         }
-        json.put("players", playersJSON);
+        data.put("players", playersJSON);
+
+        json.put("data", data);
         return json;
     }
 }

@@ -5,8 +5,11 @@ import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
+import pl.ekoreo.worldeserver.enums.OutputTypes;
+import pl.ekoreo.worldeserver.exceptions.join.JoinGameException;
 import pl.ekoreo.worldeserver.games.Game;
 import pl.ekoreo.worldeserver.services.GameManager;
+import pl.ekoreo.worldeserver.utils.JsonUtils;
 
 @Repository
 public class GameHandler extends TextWebSocketHandler{
@@ -20,7 +23,6 @@ public class GameHandler extends TextWebSocketHandler{
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         String game_id = session.getAttributes().get("game_id").toString();
         String nickname = session.getAttributes().get("nickname").toString();
-
         Game<?> game = gameManager.getGame(game_id);
 
         if(game == null){
@@ -28,8 +30,10 @@ public class GameHandler extends TextWebSocketHandler{
             session.close();
             return;
         }
-        if(!game.AddPlayer(session, nickname)){
-            session.sendMessage(new TextMessage("Game is full"));
+        try{
+            game.AddPlayer(session, nickname);
+        } catch (JoinGameException e){
+            session.sendMessage(new TextMessage(JsonUtils.createJsonSingleMessage(OutputTypes.ERROR.value, e.getMessage()).toString()));
             session.close();
             return;
         }

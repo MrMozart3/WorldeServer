@@ -2,6 +2,7 @@ package pl.ekoreo.worldeserver.games;
 
 import lombok.Data;
 import org.springframework.web.socket.WebSocketSession;
+import pl.ekoreo.worldeserver.exceptions.join.JoinGameException;
 
 import java.util.Vector;
 
@@ -25,14 +26,13 @@ public abstract class Game<PlayerType>{
      * Add player to the game
      * @param session WebSocketSession
      * @param nickname player's nickname
-     * @return true if player was added, false if not(Either game is full or already started)
+     * @throws JoinGameException if player can't join the game
      */
-    public abstract boolean AddPlayer(WebSocketSession session, String nickname);
+    public abstract void AddPlayer(WebSocketSession session, String nickname) throws JoinGameException;
     /** Remove player from the game
      * @param sessionId session id of player to remove
-     * @return true if player was removed, false if not
      */
-    public abstract boolean RemovePlayer(String sessionId);
+    public abstract void RemovePlayer(String sessionId);
     /**
      * Start the game (create new thread)
      */

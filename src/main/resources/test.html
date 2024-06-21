@@ -8,11 +8,12 @@
 <h1>WebSocket Test</h1>
 <button onclick="connect()">Connect</button>
 
-<input type="text" id="connect_id" value="" style="width: 300px;"><br><br>
+<input type="text" id="connect_id" value="" style="width: 300px;" placeholder="gameId">
+<input type="text" id="connect_nickname" value="" style="width: 100px;" placeholder="nickname"><br><br>
 
 <button onclick="sendMessage()">Send Message</button>
 
-<input type="text" id="message" value="" style="width: 300px;"><br><br>
+<input type="text" id="message" value="" style="width: 300px;" placeholder="message"><br><br>
 
 <button onclick="createGame()">Create Game</button>
 <br><br>
@@ -24,6 +25,7 @@
     var consoleTextarea = document.getElementById("console");
     var gameConsoleTextarea = document.getElementById("game_console");
     var connectIdInput = document.getElementById("connect_id");
+    var connectNicknameInput = document.getElementById("connect_nickname");
     var socket;
 
     function appendConsole(message) {
@@ -52,7 +54,7 @@
     }
 
     function connect() {
-        socket = new WebSocket("ws://localhost:8080/game?game_id=" + connectIdInput.value + "&nickname=player1");
+        socket = new WebSocket("ws://localhost:8080/game?game_id=" + connectIdInput.value + "&nickname=" + connectNicknameInput.value);
 
         socket.onopen = function(event) {
             appendConsole("Connection opened");
