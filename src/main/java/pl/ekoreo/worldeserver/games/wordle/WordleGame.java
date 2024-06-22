@@ -180,10 +180,10 @@ public class WordleGame extends Game<WordlePlayer> implements Runnable{
                         boolean skip = true;
                         for (WordlePlayer p : getPlayers()) {
                             if (!p.isSentWord() && !p.isGuessedWord()) {
-                                p.sendText(WordleUtils.GenerateWaitingForInputJson(round, line, time).toString());
+                                SendToOne(p, WordleUtils.GenerateWaitingForInputJson(round, line, time).toString());
                                 skip = false;
                             } else {
-                                p.sendText(WordleUtils.GenerateWaitingForOthersJson(round, line).toString());
+                                SendToOne(p, WordleUtils.GenerateWaitingForOthersJson(round, line).toString());
                             }
                             //TODO send all other players wordle's
                         }
